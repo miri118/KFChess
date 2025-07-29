@@ -6,9 +6,9 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import impl.command.Command;
 import impl.enums.CommandType;
 import impl.model.board.Board;
-import impl.model.command.Command;
 
 public class Graphics {
     private Path spritesFolder;

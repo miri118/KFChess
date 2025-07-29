@@ -3,8 +3,8 @@ package impl.observer;
 import java.util.ArrayList;
 import java.util.List;
 
+import impl.command.*;
 import impl.enums.PlayerType;
-import impl.model.command.*;
 import interfaces.IObserver;
 
 public class DocumentingMovesManagement implements IObserver {

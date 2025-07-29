@@ -1,4 +1,4 @@
-package impl;
+package impl.core;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -12,11 +12,15 @@ import java.util.*;
 
 import javax.imageio.ImageIO;
 
+import impl.command.CommandProducer;
+import impl.command.CommandQueue;
+import impl.input.CursorPositionManager;
+import impl.input.KeyboardInputHandler;
 import impl.model.*;
 import impl.model.board.Board;
-import impl.model.command.CommandProducer;
-import impl.model.command.CommandQueue;
 import impl.physics.Physics;
+import impl.ui.GameUI;
+import impl.ui.PlayerNameDialog;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -75,8 +79,10 @@ public class Main {
 
         // 5. יצירת ממשק המשחק
         GameUI gameUI = new GameUI(board, cursorManager, pieces);
-
+        String[] names = PlayerNameDialog.askPlayerNames();
+        gameUI.setPlayerNames(names[0], names[1]);
         // 6. הצגת הלוח עם קלט
+        System.out.println("מציגים לוח עם GameUI");
         board.showWithGameUI(gameUI, inputHandler);
     }
 

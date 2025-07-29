@@ -1,6 +1,6 @@
 package impl.physics;
 
-import impl.model.Command;
+import impl.command.Command;
 import impl.model.board.Board;
 
 public class ShortRestPhysics extends Physics implements PhysicsBehavior {

@@ -3,8 +3,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 
-import impl.enums.CommandType;
-import impl.model.Command;
+import impl.command.Command;
 import impl.model.Piece;
 import impl.model.board.Board;
 

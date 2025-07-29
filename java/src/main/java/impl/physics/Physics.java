@@ -1,8 +1,8 @@
 package impl.physics;
 // import It1_interfaces.Command;
 
-import impl.model.board.Board;
-import impl.model.command.*;;
+import impl.command.*;
+import impl.model.board.Board;;
 
 public class Physics {
     private int[] startCell;

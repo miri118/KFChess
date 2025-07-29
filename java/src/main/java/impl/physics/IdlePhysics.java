@@ -1,7 +1,7 @@
 package impl.physics;
 
-import impl.model.board.Board;
-import impl.model.command.*;;
+import impl.command.*;
+import impl.model.board.Board;;
 
 public class IdlePhysics extends Physics implements PhysicsBehavior {
     public IdlePhysics(int[] startCell, Board board, double speedMS) {
@@ -9,7 +9,7 @@ public class IdlePhysics extends Physics implements PhysicsBehavior {
     }
 
     @Override
-    public void reset(impl.model.command.Command cmd) {
+    public void reset(impl.command.Command cmd) {
         // יישום ל-idle
     }
 

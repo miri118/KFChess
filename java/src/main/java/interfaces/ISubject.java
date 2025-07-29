@@ -1,6 +1,6 @@
 package interfaces;
 
-import impl.model.command.*;;
+import impl.command.*;;
 
 public interface ISubject {
     void AddObserver(IObserver observer);

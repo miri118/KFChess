@@ -1,6 +1,7 @@
 package impl.model.board;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.KeyAdapter;
@@ -14,11 +15,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import impl.model.CursorPositionManager;
-import impl.model.GameUI;
+import impl.input.CursorPositionManager;
+import impl.input.KeyboardInputHandler;
 import impl.model.Img;
-import impl.model.KeyboardInputHandler;
 import impl.model.Piece;
+import impl.ui.GameUI;
 
 public class Board {
     private int cellHPix;
@@ -147,15 +148,19 @@ public class Board {
             });
         });
     }
-    
 
     public void showWithGameUI(GameUI gameUI, KeyboardInputHandler inputHandler) {
     SwingUtilities.invokeLater(() -> {
-        frame = new JFrame("FONG FU CHESS");
+        frame = new JFrame("KONG FU CHESS");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        BufferedImage rendered = gameUI.renderFrame();
+        System.out.println("rendered frame: " + rendered.getWidth() + "x" + rendered.getHeight());
+
+        JLabel label = new JLabel(new ImageIcon(rendered));
+        frame.getContentPane().add(label); // ← חובה!
         
-        JLabel label = new JLabel(new ImageIcon(gameUI.renderFrame()));
-        frame.getContentPane().add(label);
+        frame.setPreferredSize(new Dimension(rendered.getWidth() + 40, rendered.getHeight() + 40));
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -185,7 +190,8 @@ public class Board {
     });
 }
 
-// Clone the board with a copy of the image.
+
+    // Clone the board with a copy of the image.
     public Board clone() {
         return new Board(
                 this.cellHPix,
@@ -197,18 +203,59 @@ public class Board {
                 this.img != null ? (Img) this.img.clone() : null);
     }
 
-    public int getCellHPix() {return cellHPix;}
-    public void setCellHPix(int cellHPix) {this.cellHPix = cellHPix;}
-    public int getCellWPix() {return cellWPix;}
-    public void setCellWPix(int cellWPix) {this.cellWPix = cellWPix;}
-    public int getCellHtMeters() {return cellHtMeters;}
-    public void setCellHtMeters(int cellHtMeters) {this.cellHtMeters = cellHtMeters;}
-    public int getCellWMeters() {return cellWMeters;}
-    public void setCellWMeters(int cellWMeters) {this.cellWMeters = cellWMeters;}
-    public int getWCells() {return wCells;}
-    public void setWCells(int wCells) {this.wCells = wCells;}
-    public int getHCells() {return hCells;}
-    public void setHCells(int hCells) {this.hCells = hCells;}
-    public Img getImg() {return img;}
-    public void setImg(Img img) {this.img = img;}
+    public int getCellHPix() {
+        return cellHPix;
+    }
+
+    public void setCellHPix(int cellHPix) {
+        this.cellHPix = cellHPix;
+    }
+
+    public int getCellWPix() {
+        return cellWPix;
+    }
+
+    public void setCellWPix(int cellWPix) {
+        this.cellWPix = cellWPix;
+    }
+
+    public int getCellHtMeters() {
+        return cellHtMeters;
+    }
+
+    public void setCellHtMeters(int cellHtMeters) {
+        this.cellHtMeters = cellHtMeters;
+    }
+
+    public int getCellWMeters() {
+        return cellWMeters;
+    }
+
+    public void setCellWMeters(int cellWMeters) {
+        this.cellWMeters = cellWMeters;
+    }
+
+    public int getWCells() {
+        return wCells;
+    }
+
+    public void setWCells(int wCells) {
+        this.wCells = wCells;
+    }
+
+    public int getHCells() {
+        return hCells;
+    }
+
+    public void setHCells(int hCells) {
+        this.hCells = hCells;
+    }
+
+    public Img getImg() {
+        return img;
+    }
+
+    public void setImg(Img img) {
+        this.img = img;
+    }
 }

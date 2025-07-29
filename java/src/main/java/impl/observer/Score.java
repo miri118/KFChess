@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import impl.command.*;
 import impl.enums.PlayerType;
-import impl.model.command.*;
 import impl.model.Piece;
 import interfaces.IObserver;
 

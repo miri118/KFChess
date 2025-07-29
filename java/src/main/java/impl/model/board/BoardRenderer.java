@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Collection;
 
+import impl.input.CursorPositionManager;
 import impl.model.*;
 
 public class BoardRenderer {

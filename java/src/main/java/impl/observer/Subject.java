@@ -3,7 +3,7 @@ package impl.observer;
 import java.util.ArrayList;
 import java.util.List;
 
-import impl.model.command.*;
+import impl.command.*;
 import interfaces.IObserver;
 import interfaces.ISubject;
 

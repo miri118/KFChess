@@ -32,7 +32,8 @@ public class MockImg extends Img {
     }
 
     @Override
-    public void drawAt(Img other, int x, int y) {
+    public void drawAt(Img other, int x, int y, int w, int h) {
+        //TODO
         traj.add(new int[]{x, y});
     }
 

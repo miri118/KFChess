@@ -1,7 +1,7 @@
 package impl.model;
 
+import impl.command.Command;
 import impl.model.board.Board;
-import impl.model.command.Command;
 
 public class Piece {
     // private PieceState pieceState; // management of piece state

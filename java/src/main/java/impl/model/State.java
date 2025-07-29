@@ -2,7 +2,7 @@ package impl.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import impl.model.command.Command;
+import impl.command.Command;
 import impl.physics.Physics;
 
 public class State {

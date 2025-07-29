@@ -1,6 +1,6 @@
 package impl.physics;
 
-import impl.model.Command;
+import impl.command.Command;
 
 public interface PhysicsBehavior {
     void reset(Command cmd);

@@ -34,7 +34,7 @@ public class ImgTest {
         Img background = new Img().read(IMAGE_PATH);
         Img patch = new Img().read(IMAGE_PATH, new Dimension(10, 10), false, null);
 
-        assertDoesNotThrow(() -> patch.drawOn(background, 5, 5),
+        assertDoesNotThrow(() -> patch.drawOn(background, 5, 5, 10, 10),
                 "ציור על תמונה גרם לחריגה");
     }
 
@@ -61,7 +61,7 @@ public class ImgTest {
         Img base = new Img().read(IMAGE_PATH);
         Img small = new Img().read(IMAGE_PATH, new Dimension(100, 100), false, null);
         assertThrows(IllegalArgumentException.class, () ->
-                small.drawOn(base, 5000, 5000),
+                small.drawOn(base, 5000, 5000, 100, 100),
                 "ציור מחוץ לתחום היה צריך לזרוק חריגה");
     }
 }

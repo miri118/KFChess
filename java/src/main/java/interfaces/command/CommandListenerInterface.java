@@ -1,6 +1,6 @@
 package interfaces.command;
 
-import impl.model.command.Command;
+import impl.command.Command;
 
 public interface CommandListenerInterface {
     boolean supports(Command cmd);
