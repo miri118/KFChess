@@ -1,50 +1,87 @@
 package impl.model;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 public class Moves {
-    private Path txtPath;
-    private int[] dims;
+    private final int rows;
+    private final int cols;
+    private final Map<Pair, String> moves = new HashMap<>(); // (dr,dc) -> tag
+
 
     /**
      * Initialize moves with rules from text file and board dimensions.
      */
-    public Moves(Path txtPath, int[] dims) {
-        this.txtPath = txtPath;
-        this.dims = dims;
+    public Moves(Path movesFile, int rows, int cols) {
+        this.rows = rows;
+        this.cols = cols;
+        if (Files.exists(movesFile)) {
+            try (BufferedReader br = Files.newBufferedReader(movesFile)) {
+                br.lines().forEach(line -> {
+                    String l = line.strip();
+                    if (l.isEmpty() || l.startsWith("#")) return;
+                    String[] parts = l.split(":", 2);
+                    String[] coords = parts[0].split(",");
+                    int dr = Integer.parseInt(coords[0].trim());
+                    int dc = Integer.parseInt(coords[1].trim());
+                    String tag = parts.length > 1 ? parts[1].strip() : "";
+                    moves.put(new Pair(dr, dc), tag);
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
-    public Moves()
-    {
-
-    }
-
-    /**
-     * Get all possible moves from a given position.
-     */
-    public List<int[]> getMoves(int r, int c) {
-        // ...existing code...
-        return null;
-    }
-
-
-    // Getters and setters
-    public Path getTxtPath() {
-        return txtPath;
-    }
-
-
-    public void setTxtPath(Path txtPath) {
-        this.txtPath = txtPath;
+    public Moves(){
+        this.rows = 8; // Default board size
+        this.cols = 8; // Default board size
     }
 
-
-    public int[] getDims() {
-        return dims;
+    public boolean isDstCellValid(int dr, int dc, boolean dstHasPiece) {
+        String tag = moves.get(new Pair(dr, dc));
+        if (tag == null) {
+            // Unknown move – not allowed (Python version returns False)
+            return false;
+        }
+        if (tag.isEmpty()) return true; // can both capture & non-capture
+        switch (tag) {
+            case "capture":
+                return dstHasPiece;
+            case "non_capture":
+                return !dstHasPiece;
+            default:
+                return false;
+        }
     }
 
-
-    public void setDims(int[] dims) {
-        this.dims = dims;
+    public boolean isValid(int[] srcCell, int[] dstCell, Set<Pair> occupiedCells) {
+        int dstR = dstCell[0], dstC = dstCell[1];
+        if (dstR < 0 || dstR >= rows || dstC < 0 || dstC >= cols) return false;
+        int dr = dstR - srcCell[0];
+        int dc = dstC - srcCell[1];
+        boolean dstHasPiece = occupiedCells.contains(new Pair(dstR, dstC));
+        if (!isDstCellValid(dr, dc, dstHasPiece)) return false;
+        if (!pathIsClear(srcCell, dstCell, occupiedCells)) return false;
+        return true;
+    }
+    
+    private boolean pathIsClear(int[] srcCell, int[] dstCell, Set<Pair> occupiedCells) {
+        int dr = dstCell[0] - srcCell[0];
+        int dc = dstCell[1] - srcCell[1];
+        if (Math.abs(dr) <= 1 && Math.abs(dc) <= 1) return true;
+        int steps = Math.max(Math.abs(dr), Math.abs(dc));
+        double stepR = dr / (double) steps;
+        double stepC = dc / (double) steps;
+        for (int i = 1; i < steps; i++) {
+            int r = srcCell[0] + (int) Math.round(i * stepR);
+            int c = srcCell[1] + (int) Math.round(i * stepC);
+            if (occupiedCells.contains(new Pair(r, c))) return false;
+        }
+        return true;
     }
 }

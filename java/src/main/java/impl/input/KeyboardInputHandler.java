@@ -74,10 +74,8 @@ public class KeyboardInputHandler {
             cursorManager.move(playerId, delta[0], delta[1]);
             int[] newPos = cursorManager.getCursor(playerId);
             System.out.println("[CURSOR] " + playerId + " moved to: " + Arrays.toString(newPos));
-            board.renderFrame(pieces.values(), cursorManager); // עדכן רינדור
+            board.renderFrame(pieces.values(), cursorManager); // update the board display
             // Draw cursor overlay (without repaint)
-            // 1. רענון הלוח (למחוק שכבת קורסורים ישנה)
-            // 1. רענון הלוח (למחוק שכבת קורסורים ישנה)
             Img boardImg = (Img) board.getImg();
             BufferedImage base = boardImg.getImg();
             BufferedImage updated = new BufferedImage(base.getWidth(), base.getHeight(), base.getType());

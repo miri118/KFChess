@@ -18,24 +18,24 @@ public class PlayerPanel {
         this.playerName = name;
         this.score = 0;
         this.moves = new ArrayList<>();
-        this.bounds = new Rectangle(200, screenSize.height); // רוחב 200, גובה מלא
+        this.bounds = new Rectangle(200, screenSize.height);
     }
 
     public void draw(Graphics2D g, int x) {
-        // רקע הפאנל
+        // draw background
         g.setColor(new Color(50, 50, 50, 200));
         g.fillRect(x, 0, bounds.width, bounds.height);
         
-        // כותרת
+        // headline
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 20));
         g.drawString(playerName, x + 20, 30);
         
-        // ניקוד
-        g.drawString("ניקוד: " + score, x + 20, 60);
+        // score
+        g.drawString("score: " + score, x + 20, 60);
         
-        // מהלכים
-        g.drawString("מהלכים:", x + 20, 90);
+        // moves
+        g.drawString("moves:", x + 20, 90);
         for(int i=0; i < Math.min(moves.size(), 5); i++) {
             g.drawString(moves.get(i), x + 20, 120 + i*30);
         }

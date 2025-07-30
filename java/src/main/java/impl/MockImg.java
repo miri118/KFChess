@@ -14,7 +14,7 @@ public class MockImg extends Img {
     public int W, H;
 
     public MockImg() {
-        super(null); // פתרון השגיאה
+        super(null);
         this.img = "MOCK-PIXELS";
         this.W = 1;
         this.H = 1;

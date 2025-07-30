@@ -28,7 +28,6 @@ public class GameUI {
         this.pieces = pieces;
         loadBackground();
         // for the player panels
-        // int panelHeight = board.getImg().getImg().getHeight();
         Dimension panelSize = new Dimension(200, background.getImg().getHeight());
 
         this.player1Panel = new PlayerPanel("player 1", panelSize);
@@ -37,14 +36,12 @@ public class GameUI {
 
     private void loadBackground() {
         try {
-            // טעינת רקע מתיקיית resources
             URL resourceUrl = getClass().getClassLoader().getResource("background.png");
             if (resourceUrl != null) {
                 Path backgroundPath = Paths.get(resourceUrl.toURI());
                 BufferedImage bgImage = ImageIO.read(backgroundPath.toFile());
                 this.background = new Img(bgImage);
             } else {
-                // רקע ברירת מחדל אם אין תמונה
                 BufferedImage defaultBg = new BufferedImage(1000, 800, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g = defaultBg.createGraphics();
                 g.setColor(new Color(30, 30, 70));
@@ -68,28 +65,26 @@ public class GameUI {
         int boardWidth = board.getImg().getImg().getWidth();
         int boardHeight = board.getImg().getImg().getHeight();
 
-        int frameWidth = margin * 2 + boardWidth + 2 * panelWidth + 40; // 40 = רווח בין לוח לפאנלים
+        int frameWidth = margin * 2 + boardWidth + 2 * panelWidth + 40;//space for player panels
         int frameHeight = margin * 2 + boardHeight;
 
         BufferedImage frame = new BufferedImage(frameWidth, frameHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = frame.createGraphics();
 
-        // רקע
-        g.setColor(new Color(30, 30, 70)); // רקע קבוע
+        // background
+        g.setColor(new Color(30, 30, 70)); //const background color
         g.fillRect(0, 0, frameWidth, frameHeight);
 
-        // מיקום הלוח באמצע
+        // place board image centerally
         int boardX = margin + panelWidth + 20;
         int boardY = margin;
 
-        // ציור לוח
+        //draw board image
         BufferedImage boardFrame = BoardRenderer.renderFrame(board, pieces.values(), cursorManager);
         g.drawImage(boardFrame, boardX, boardY, null);
 
-        // ציור פאנלים
-        // player1Panel.draw(g, margin); // בצד שמאל
-        // player2Panel.draw(g, boardX + boardWidth + 20); // בצד ימין
-        int panelY = boardY; // יישור אנכי של הפאנל לגובה הלוח
+        // draw player panels
+        int panelY = boardY;
 
         drawSinglePanel(g, "P1", margin, panelY, panelWidth, boardHeight);
 
@@ -97,29 +92,6 @@ public class GameUI {
         
         g.dispose();
         return frame;
-
-        // // 1. ציור רקע
-        // BufferedImage frame = new BufferedImage(
-        // background.getImg().getWidth(),
-        // background.getImg().getHeight(),
-        // BufferedImage.TYPE_INT_ARGB);
-        // Graphics2D g = frame.createGraphics();
-        // g.drawImage(background.getImg(), 0, 0, null);
-
-        // // 2. חישוב מיקום הלוח במרכז
-        // int boardX = (frame.getWidth() - board.getImg().getImg().getWidth()) / 2;
-        // int boardY = (frame.getHeight() - board.getImg().getImg().getHeight()) / 2;
-
-        // // 3. ציור הלוח עם הכלים (באמצעות BoardRenderer הקיים)
-        // BufferedImage boardFrame = BoardRenderer.renderFrame(board, pieces.values(),
-        // cursorManager);
-        // g.drawImage(boardFrame, boardX, boardY, null);
-
-        // // 4. ציור פאנלי שחקנים
-        // drawPlayerPanels(g, boardX, boardY);
-
-        // g.dispose();
-        // return frame;
     }
 
     private void drawPlayerPanels(Graphics2D g, int boardX, int boardY) {
@@ -135,23 +107,23 @@ public class GameUI {
 
     private void drawSinglePanel(Graphics2D g, String playerId,
             int x, int y, int width, int height) {
-        // רקע פאנל
+        // background
         g.setColor(new Color(30, 30, 30, 200));
         g.fillRoundRect(x, y, width, height, 15, 15);
 
-        // מסגרת
+        // border
         g.setColor(playerId.equals("P1") ? Color.GREEN : Color.MAGENTA);
         g.drawRoundRect(x, y, width, height, 15, 15);
 
-        // כותרת
+        // headline
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 20));
         g.drawString(playerId.equals("P1") ? player1Panel.getName() : player2Panel.getName(), x + 20, y + 30);
 
-        // ניקוד
-        g.drawString("ניקוד: 0", x + 20, y + 60);
+        // score
+        g.drawString("score: 0", x + 20, y + 60);
 
-        // כותרת מהלכים
-        g.drawString("מהלכים:", x + 20, y + 90);
+        // moves
+        g.drawString("moves:", x + 20, y + 90);
     }
 }

@@ -10,12 +10,12 @@ import java.awt.image.BufferedImage;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ImgTest {
-    private static final String IMAGE_PATH = "src/test/resources/board.png"; // ודא שהתמונה קיימת
+    private static final String IMAGE_PATH = "src/test/resources/board.png";
 
     @Test
     public void testReadImage() {
         Img img = new Img().read(IMAGE_PATH);
-        assertNotNull(img.getImg(), "התמונה לא נטענה כראוי");
+        assertNotNull(img.getImg(), "loaded image should not be null");
     }
 
     @Test
@@ -24,9 +24,9 @@ public class ImgTest {
         Img img = new Img().read(IMAGE_PATH, targetSize, true, null);
         BufferedImage result = img.getImg();
 
-        assertNotNull(result, "התמונה ריקה");
+        assertNotNull(result, "empty image after read");
         assertTrue(result.getWidth() <= 100 && result.getHeight() <= 50,
-                "גודל התמונה שגוי לאחר resize עם keepAspect");
+                "image size should be within target dimensions");
     }
 
     @Test
@@ -35,7 +35,7 @@ public class ImgTest {
         Img patch = new Img().read(IMAGE_PATH, new Dimension(10, 10), false, null);
 
         assertDoesNotThrow(() -> patch.drawOn(background, 5, 5, 10, 10),
-                "ציור על תמונה גרם לחריגה");
+                "drawon caused an exception");
     }
 
     @Test
@@ -43,7 +43,7 @@ public class ImgTest {
         Img img = new Img().read(IMAGE_PATH);
         assertDoesNotThrow(() ->
                 img.putText("Hello", 10, 20, 1.0f, Color.RED, 1),
-                "כתיבת טקסט זרקה חריגה");
+                "putText caused an exception");
     }
 
     @Test
@@ -51,9 +51,9 @@ public class ImgTest {
         Img original = new Img().read(IMAGE_PATH);
         Img cloned = original.clone();
 
-        assertNotSame(original.getImg(), cloned.getImg(), "clone צריך להיות אובייקט חדש");
-        assertEquals(original.getImg().getWidth(), cloned.getImg().getWidth(), "רוחב שונה בין המקור לשכפול");
-        assertEquals(original.getImg().getHeight(), cloned.getImg().getHeight(), "גובה שונה בין המקור לשכפול");
+        assertNotSame(original.getImg(), cloned.getImg(), "there should be a new image instance - cloned");
+        assertEquals(original.getImg().getWidth(), cloned.getImg().getWidth(), "difference in width between original and cloned");
+        assertEquals(original.getImg().getHeight(), cloned.getImg().getHeight(), "height should match between original and cloned");
     }
 
     @Test
@@ -62,6 +62,6 @@ public class ImgTest {
         Img small = new Img().read(IMAGE_PATH, new Dimension(100, 100), false, null);
         assertThrows(IllegalArgumentException.class, () ->
                 small.drawOn(base, 5000, 5000, 100, 100),
-                "ציור מחוץ לתחום היה צריך לזרוק חריגה");
+                "should throw when drawing out of bounds");
     }
 }

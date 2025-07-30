@@ -7,9 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * Lightweight image‑utility class using only standard JDK APIs.
- */
+
 public class Img {
 
     private BufferedImage img;
@@ -66,37 +64,7 @@ public class Img {
         return read(path, null, false, null);
     }
 
-    // ----------- draw this image onto another -----------
-    // public void drawOn(Img board, int cellX, int cellY, int cellW, int cellH) {
-    // if (img == null || board.img == null)
-    // throw new IllegalStateException("Both images must be loaded.");
-    // // position in pixels
-    // int xPix = cellX * cellW;
-    // int yPix = cellY * cellH;
-    // // :white_check_mark: print debug info
-    // System.out.printf(":large_green_circle: Piece - Placing on board at pixel
-    // coords: (%d, %d)%n", xPix, yPix);
-    // System.out.printf(":large_green_circle: Piece - Resizing to: %dx%d%n", cellW,
-    // cellH);
-    // System.out.printf(":large_green_circle: Piece - Board image size: %dx%d%n",
-    // board.img.getWidth(), board.img.getHeight());
-    // System.out.printf(":large_green_circle: Piece - Actual image input size:
-    // %dx%d%n", img.getWidth(), img.getHeight());
-    // // change the size of the image to fit the cell
-    // Image tmp = img.getScaledInstance(cellW, cellH, Image.SCALE_SMOOTH);
-    // BufferedImage resized = new BufferedImage(cellW, cellH,
-    // BufferedImage.TYPE_INT_ARGB);
-    // Graphics2D g2 = resized.createGraphics();
-    // g2.drawImage(tmp, 0, 0, null);
-    // g2.dispose();
-    // // draw the resized image onto the board
-    // Graphics2D g = this.img.createGraphics();
-    // g.setComposite(AlphaComposite.SrcOver);
-    // g.drawImage(resized, xPix, yPix, null);
-    // g.dispose();
-    // }
-
-    // from deepseek
+    
     public void drawOn(Img board, int cellRow, int cellCol, int cellW, int cellH) {
         if (img == null || board.img == null)
             throw new IllegalStateException("Both images must be loaded.");
@@ -130,7 +98,6 @@ public class Img {
         System.out.printf(":art: Img.drawAt → drawing at (%d, %d), size %dx%d\n", xPix, yPix, wPix, hPix);
     }
 
-    // ----------- annotate with text -----------
     public void putText(String txt, int x, int y, float fontSize,
             Color color, int thickness /* unused in Java2D */) {
 
@@ -146,7 +113,6 @@ public class Img {
         g.dispose();
     }
 
-    // ----------- display in a Swing window -----------
     public void show() {
         if (img == null)
             throw new IllegalStateException("Image not loaded.");
@@ -161,7 +127,6 @@ public class Img {
         });
     }
 
-    // ----------- access (optional) -----------
     public BufferedImage getImg() {
         return img;
     }

@@ -3,7 +3,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import impl.command.Command;
-import impl.physics.Physics;
 
 public class State {
     private Graphics graphics;
@@ -17,6 +16,7 @@ public class State {
         this.graphics = graphics;
         this.physics = physics;
         this.transitions = new HashMap<>();
+        this.moves = moves;
     }
 
     /**
@@ -31,12 +31,11 @@ public class State {
      */
     public void reset(Command cmd) {
         if (cmd == null) {
-        // כשאין פקודה, נשתמש רק במצב הנוכחי ולא נזרוק NPE
         return;
-    }
+        }
         cmd.setTimestamp((int) System.currentTimeMillis());
         graphics.reset(cmd);
-        physics.reset(cmd);
+        physics.reset(cmd, physics.getEndCell());
     }
 
     /**

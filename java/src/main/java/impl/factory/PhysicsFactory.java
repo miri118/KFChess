@@ -1,23 +1,16 @@
 package impl.factory;
-
+import impl.factory.dto.PhysicsDto;
+import impl.model.Physics;
 import impl.model.board.Board;
-import impl.physics.Physics;
+    public class PhysicsFactory {
+    private final Board board;
 
-public class PhysicsFactory { // very light for now
-    private Board board;
-
-    /**
-     * Initialize physics factory with board.
-     */
     public PhysicsFactory(Board board) {
         this.board = board;
     }
 
-    /**
-     * Create a physics object with the given configuration.
-     */
-    public Physics create(Object start_cell, Object cfg) {
-        // ...implementation...
-        return null;
+    public Physics load(int[] startCell, PhysicsDto dto) {
+        double speed =dto != null ? dto.speed_m_per_sec : 0.0;
+        return new Physics(startCell, board, speed);
     }
 }

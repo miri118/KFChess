@@ -107,7 +107,7 @@ public class Board {
             int width = getWCells() * getCellWPix();
             int height = getHCells() * getCellHPix();
 
-            // פונקציה בונה לנו פריים מלא מכל הרשימות
+            // function to render the frame
             Function<BufferedImage, BufferedImage> renderFrame = raw -> BoardRenderer.renderFrame(this, pieces,
                     cursorManager);
 
@@ -140,7 +140,7 @@ public class Board {
                     };
                     if (key != null) {
                         inputHandler.onKeyPressed(key, (int) System.currentTimeMillis());
-                        // ברגע שלחצו – מבצעים רינדור מחדש של לוח+כלים+סמנים
+                        // on key press, re-render the frame and board and cursor
                         BufferedImage next = renderFrame.apply(raw);
                         label.setIcon(new ImageIcon(next));
                     }
@@ -158,7 +158,7 @@ public class Board {
         System.out.println("rendered frame: " + rendered.getWidth() + "x" + rendered.getHeight());
 
         JLabel label = new JLabel(new ImageIcon(rendered));
-        frame.getContentPane().add(label); // ← חובה!
+        frame.getContentPane().add(label);
         
         frame.setPreferredSize(new Dimension(rendered.getWidth() + 40, rendered.getHeight() + 40));
         frame.pack();
@@ -257,5 +257,9 @@ public class Board {
 
     public void setImg(Img img) {
         this.img = img;
+    }
+
+    public double cellToMeters(double distanceCells) {
+        return distanceCells * 1.0;
     }
 }

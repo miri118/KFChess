@@ -1,6 +1,5 @@
 package impl.command.listeners;
 
-import java.awt.Graphics2D;
 import java.util.Map;
 
 import impl.command.*;
@@ -35,7 +34,7 @@ public class RestCommandListener{
             // piece.drawOnBoard(board, (int) now);
             int[] cursorPos = cursorManager.getCursor(cmd.getPieceId());
             board.drawCursorOverlay(cmd.getPieceId(), cursorPos, board.getImg());
-            board.repaint(); // ← כן לשים!
+            board.repaint();
         }
     }
 }

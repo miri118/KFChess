@@ -4,13 +4,10 @@ import impl.command.Command;
 import impl.model.board.Board;
 
 public class Piece {
-    // private PieceState pieceState; // management of piece state
+    
     private State visualState; // management of visual state
     private String pieceId;
-
-    /**
-     * Initialize a piece with ID and initial state.
-     */
+ 
     public Piece(String pieceId, State initState) {
         this.pieceId = pieceId;
         this.visualState = initState;
@@ -47,7 +44,7 @@ public class Piece {
 
     public void drawOnBoard(Img frameImg, Board board, int nowMs) {
         // 1. get the cell position from the physics state
-        int[] cell = visualState.getPhysics().getPos(); // [row, col]
+        int[] cell = visualState.getPhysics().getEndCell(); // [row, col]
 
         // 2. cast to pixel position
         int wPix = board.getCellWPix();
@@ -58,7 +55,7 @@ public class Piece {
         System.out.println("cell = " + cell[0] + ", " + cell[1]);
 
         if (sprite == null) {
-            System.out.println("⚠️ sprite is null for pieceId: " + pieceId);
+            System.out.println("sprite is null for pieceId: " + pieceId);
             return;
         }
         System.out.printf("Drawing piece %s at [%d,%d] -> pixels (%d,%d)%n",
@@ -74,7 +71,7 @@ public class Piece {
     }
 
     public int[] getPosition() {
-        return visualState.getPhysics().getPos();
+        return visualState.getPhysics().getEndCell();
     }
 
     public State getState() {

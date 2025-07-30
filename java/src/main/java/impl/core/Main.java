@@ -18,7 +18,6 @@ import impl.input.CursorPositionManager;
 import impl.input.KeyboardInputHandler;
 import impl.model.*;
 import impl.model.board.Board;
-import impl.physics.Physics;
 import impl.ui.GameUI;
 import impl.ui.PlayerNameDialog;
 
@@ -32,13 +31,11 @@ public class Main {
         // 2. create the board
         Board board = new Board(60, 60, 0, 0, 8, 8, imgBoard);
 
-        // יצירת תור הפקודות (ריק כרגע)
         CommandQueue commandQueue = new CommandQueue();
 
-        // יצירת יצרן הפקודות עם בנאי ברירת מחדל (ללא פרמטרים)
         CommandProducer commandProducer = new CommandProducer();
 
-        // יצירת מנהל הסמנים
+        // create a cursor manager for the board
         CursorPositionManager cursorManager = new CursorPositionManager(8, 8);
 
         // 3. load the pieces
@@ -69,7 +66,7 @@ public class Main {
             Piece pieceObj = createPiece(pieceId, state);
             pieces.put(pieceId, pieceObj);
         }
-        // 4. יצירת מנהל קלט מהמקלדת
+        // 4. create the keyboard input handler
         KeyboardInputHandler inputHandler = new KeyboardInputHandler(
                 commandProducer,
                 commandQueue,
@@ -77,17 +74,17 @@ public class Main {
                 board,
                 pieces);
 
-        // 5. יצירת ממשק המשחק
+        // 5. create the game UI
         GameUI gameUI = new GameUI(board, cursorManager, pieces);
         String[] names = PlayerNameDialog.askPlayerNames();
         gameUI.setPlayerNames(names[0], names[1]);
         // 6. הצגת הלוח עם קלט
-        System.out.println("מציגים לוח עם GameUI");
+        //System.out.println("מציגים לוח עם GameUI");
         board.showWithGameUI(gameUI, inputHandler);
     }
 
     private static Graphics createGraphics(Path spritesFolder) {
-        Graphics graphic = new Graphics(spritesFolder, null, true, 5.0);
+        Graphics graphic = new Graphics(spritesFolder, true, 5.0);
         return graphic;
     }
 
@@ -96,7 +93,7 @@ public class Main {
     }
 
     private static Moves createMoves(Path movesPath, int[] dims) {
-        return new Moves(movesPath, dims);
+        return new Moves(movesPath, dims[0], dims[1]);
     }
 
     private static State createState(Graphics graphic, Physics physics, Moves moves) {

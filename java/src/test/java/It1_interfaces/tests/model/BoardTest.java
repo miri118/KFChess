@@ -15,8 +15,7 @@ class BoardTest {
 
     @BeforeEach
     void setUp() {
-        // אפשר להשתמש ב-Mock של Img או באובייקט פשוט אם לא תלוי בגרפיקה
-        mockImg = new Img(); // ודא של-Img יש קונסטרקטור ריק או תחליף פשוט
+        mockImg = new Img();
         board = new Board(10, 20, 1, 1, 8, 8, mockImg);
     }
 
@@ -81,5 +80,4 @@ class BoardTest {
         assertThrows(IllegalArgumentException.class, () -> board.cellStringToCoords("A9")); // row > 7
     }
 
-    // אם רוצים לבדוק את show() – זה מצריך בדיקת UI, לרוב לא עושים ב-Unit Test.
 }

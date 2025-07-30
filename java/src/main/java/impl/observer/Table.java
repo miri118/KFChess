@@ -36,13 +36,6 @@ public class Table {
             if (move == null)
                 continue;
             int y = startY + i * rowHeight;
-            // img.putText("pieceId: " + move.getPieceId(), startX + 10, y, fontSize,
-            // textColor, 1);
-            // img.putText("from: " + move.getFrom(), startX + 150, y, fontSize, textColor,
-            // 1);
-            // img.putText("to: " + move.getTo(), startX + 300, y, fontSize, textColor, 1);
-            // img.putText("timestamp: " + move.getTimestamp(), startX + 450, y, fontSize,
-            // textColor, 1);
         }
     }
 }
