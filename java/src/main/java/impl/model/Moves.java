@@ -38,8 +38,8 @@ public class Moves {
         }
     }
     public Moves(){
-        this.rows = 8; // Default board size
-        this.cols = 8; // Default board size
+        this.rows = 8; 
+        this.cols = 8;
     }
 
     public boolean isDstCellValid(int dr, int dc, boolean dstHasPiece) {

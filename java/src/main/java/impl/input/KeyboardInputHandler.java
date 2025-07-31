@@ -44,31 +44,44 @@ public class KeyboardInputHandler {
 
     public void onKeyPressed(String key, int timestamp) {
         System.out.println("[KEYBOARD] Key pressed: " + key + " at " + timestamp);
-
         String upperKey = key.toUpperCase();
 
-        // Player 1
-        handlePlayerInput("P1", upperKey, timestamp, "ENTER", "BACK_SPACE",
-                Map.of("UP", new int[] { -1, 0 }, "DOWN", new int[] { 1, 0 },
-                        "LEFT", new int[] { 0, -1 }, "RIGHT", new int[] { 0, 1 }));
+        // player 1 - green – WASD + Space + Shift
+        if ("WASD".contains(upperKey) || upperKey.equals("SPACE")) {
+            handlePlayerInput("P1", upperKey, timestamp, "SPACE", "SHIFT", Map.of(
+                    "W", new int[] { -1, 0 },
+                    "S", new int[] { 1, 0 },
+                    "A", new int[] { 0, -1 },
+                    "D", new int[] { 0, 1 }));
+            return;
+        }
 
-        // Player 2
-        handlePlayerInput("P2", upperKey, timestamp, "SPACE", "SHIFT",
-                Map.of("W", new int[] { -1, 0 }, "S", new int[] { 1, 0 },
-                        "A", new int[] { 0, -1 }, "D", new int[] { 0, 1 },
-                        "UP", new int[] { -1, 0 }, "DOWN", new int[] { 1, 0 },
-                        "LEFT", new int[] { 0, -1 }, "RIGHT", new int[] { 0, 1 }));
+        // player 2 - purple – Arrow keys + Enter + Backspace
+        if (upperKey.equals("UP") || upperKey.equals("DOWN") ||
+                upperKey.equals("LEFT") || upperKey.equals("RIGHT") || upperKey.equals("ENTER")) {
+            handlePlayerInput("P2", upperKey, timestamp, "ENTER", "BACK_SPACE", Map.of(
+                    "UP", new int[] { -1, 0 },
+                    "DOWN", new int[] { 1, 0 },
+                    "LEFT", new int[] { 0, -1 },
+                    "RIGHT", new int[] { 0, 1 }));
+            return;
+        }
+
+        // ignore unhandled keys
+        System.out.println("[IGNORED] Key '" + key + "' is not handled");
     }
 
     private String findPieceAt(int[] pos, String playerId) {
         for (Map.Entry<String, Piece> entry : pieces.entrySet()) {
             int[] p = entry.getValue().getPosition();
-            if (p[0] == pos[0] && p[1] == pos[1] &&
-                    ((playerId.equals("P1") && entry.getKey().endsWith("B")) ||
-                            (playerId.equals("P2") && entry.getKey().endsWith("W")))) {
+            boolean isControlled = (playerId.equals("P1") && entry.getKey().endsWith("W")) ||
+                    (playerId.equals("P2") && entry.getKey().endsWith("B"));
+            if (p[0] == pos[0] && p[1] == pos[1] && isControlled) {
+                System.out.println("[DEBUG1] Found piece " + entry.getKey() + " at " + Arrays.toString(pos));
                 return entry.getKey();
             }
         }
+        System.out.println("[DEBUG2] No piece found at: " + Arrays.toString(pos));
         return null;
     }
 
@@ -82,14 +95,14 @@ public class KeyboardInputHandler {
             System.out.println("[CURSOR] " + playerId + " moved to: " + Arrays.toString(newPos));
             board.renderFrame(pieces.values(), cursorManager); // update the board display
             // Draw cursor overlay (without repaint)
-            Img boardImg = (Img) board.getImg();
-            BufferedImage base = boardImg.getImg();
-            BufferedImage updated = new BufferedImage(base.getWidth(), base.getHeight(), base.getType());
-            Graphics2D g2d = updated.createGraphics();
-            g2d.drawImage(base, 0, 0, null);
-            g2d.dispose();
-            // boardImg.setImg(updated);
-            g2d.dispose();
+            // Img boardImg = (Img) board.getImg();
+            // BufferedImage base = boardImg.getImg();
+            // BufferedImage updated = new BufferedImage(base.getWidth(), base.getHeight(),
+            // base.getType());
+            // Graphics2D g2d = updated.createGraphics();
+            // g2d.drawImage(base, 0, 0, null);
+            // g2d.dispose();
+            // // boardImg.setImg(updated);
         } else if (key.equals(confirmKey)) {
             System.out.println("[COMMAND] " + playerId + " pressed confirm (" + key + ")");
             sendMoveCommand(playerId, timestamp);

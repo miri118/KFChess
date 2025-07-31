@@ -44,11 +44,11 @@ public class State {
      * Update the state based on current time.
      */
     public State update(int nowMs) {
-        graphics.reset(null);
         Command cmd = getCommand();
         if (cmd != null) {
             return processCommand(cmd, nowMs);
         }
+        graphics.update(nowMs);
         return this;
     }
 
