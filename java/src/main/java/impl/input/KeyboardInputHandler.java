@@ -47,7 +47,8 @@ public class KeyboardInputHandler {
         String upperKey = key.toUpperCase();
 
         // player 1 - green – WASD + Space + Shift
-        if ("WASD".contains(upperKey) || upperKey.equals("SPACE")) {
+        if (upperKey.equals("W") || upperKey.equals("A") || upperKey.equals("S") || upperKey.equals("D")
+                || upperKey.equals("SPACE")) {
             handlePlayerInput("P1", upperKey, timestamp, "SPACE", "SHIFT", Map.of(
                     "W", new int[] { -1, 0 },
                     "S", new int[] { 1, 0 },
@@ -72,11 +73,18 @@ public class KeyboardInputHandler {
     }
 
     private String findPieceAt(int[] pos, String playerId) {
+        System.out.println("[DEBUG] Checking cursor at " + Arrays.toString(pos));
+
         for (Map.Entry<String, Piece> entry : pieces.entrySet()) {
+            System.out.println("[DEBUG] Considering piece " + entry.getKey() + " at "
+                    + Arrays.toString(entry.getValue().getPosition()));
             int[] p = entry.getValue().getPosition();
-            boolean isControlled = (playerId.equals("P1") && entry.getKey().endsWith("W")) ||
-                    (playerId.equals("P2") && entry.getKey().endsWith("B"));
-            if (p[0] == pos[0] && p[1] == pos[1] && isControlled) {
+
+            String id = entry.getKey();
+            boolean isControlled = (playerId.equals("P1") && id.contains("W")) ||
+                    (playerId.equals("P2") && id.contains("B"));
+
+            if (Arrays.equals(p, pos) && isControlled) {
                 System.out.println("[DEBUG1] Found piece " + entry.getKey() + " at " + Arrays.toString(pos));
                 return entry.getKey();
             }

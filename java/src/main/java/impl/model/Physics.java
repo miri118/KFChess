@@ -1,4 +1,5 @@
 package impl.model;
+
 import impl.command.Command;
 import impl.model.board.Board;
 
@@ -9,27 +10,28 @@ public class Physics {
     private double speedMS;
     private long startMs;
     private double durationMs;
+    private final String nextStateName;
 
-    public Physics(int[] startCell, Board board, double speedMS) {
+    public Physics(int[] startCell, Board board, double speedMS, String nextStateName) {
         this.startCell = startCell;
         this.endCell = startCell.clone();
         this.board = board;
         this.speedMS = speedMS;
         this.startMs = System.currentTimeMillis();
         this.durationMs = 0;
+        this.nextStateName = nextStateName;
     }
 
-    public void reset(Command command, int[] newTarget) {
-        //maybe to delete
-        this.startCell = newTarget;
-        // this.startCell = this.endCell;
+    public void reset(Command command, int[] newTarget, int nowMs) {
+        this.startCell = this.endCell.clone();
         this.endCell = newTarget;
-        this.startMs = System.currentTimeMillis();
+        this.startMs = nowMs;
         this.durationMs = computeDuration(startCell, endCell, speedMS);
     }
 
     private double computeDuration(int[] start, int[] end, double speed) {
-        if (speed <= 0.0001) return 0;
+        if (speed <= 0.0001)
+            return 0;
 
         double dx = end[0] - start[0];
         double dy = end[1] - start[1];
@@ -39,12 +41,17 @@ public class Physics {
     }
 
     public int[] getCurrentCell(int nowMs) {
-        if (durationMs <= 0) return endCell;
+        if (durationMs <= 0)
+            return endCell;
 
         double progress = Math.min(1.0, (nowMs - startMs) / durationMs);
         int currentRow = (int) (startCell[0] + (endCell[0] - startCell[0]) * progress);
         int currentCol = (int) (startCell[1] + (endCell[1] - startCell[1]) * progress);
-        return new int[]{ currentRow, currentCol };
+        return new int[] { currentRow, currentCol };
+    }
+
+    public boolean isFinished(int nowMs) {
+        return durationMs <= 0 || nowMs - startMs >= durationMs;
     }
 
     public int[] getStartCell() {
@@ -69,5 +76,9 @@ public class Physics {
 
     public double getDurationMs() {
         return durationMs;
+    }
+
+    public String getNextStateName() {
+        return nextStateName;
     }
 }

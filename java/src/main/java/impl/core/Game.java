@@ -83,7 +83,7 @@ public class Game {
             // 5. crashing recognize collisions
             resolveCollisions();
 
-            // 💤 take a breath
+            // take a breath
             try {
                 Thread.sleep(16); // -60 FPS
             } catch (InterruptedException e) {

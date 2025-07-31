@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 import java.net.URL;
 import javax.imageio.ImageIO;
@@ -82,7 +83,7 @@ public class GameUI {
         //draw board image
         BufferedImage boardFrame = BoardRenderer.renderFrame(board, pieces.values(), cursorManager);
         g.drawImage(boardFrame, boardX, boardY, null);
-
+        System.out.println("Drawing cursor at " + Arrays.toString(cursorManager.getCursor(player2Panel.getName())));
         // draw player panels
         int panelY = boardY;
 
@@ -94,16 +95,16 @@ public class GameUI {
         return frame;
     }
 
-    private void drawPlayerPanels(Graphics2D g, int boardX, int boardY) {
-        int panelWidth = player1Panel.getBounds().width;
-        int panelHeight = player1Panel.getBounds().height;
+    // private void drawPlayerPanels(Graphics2D g, int boardX, int boardY) {
+    //     int panelWidth = player1Panel.getBounds().width;
+    //     int panelHeight = player1Panel.getBounds().height;
 
-        // pannel player 1
-        player1Panel.draw(g, boardX - panelWidth - 20);
+    //     // pannel player 1
+    //     player1Panel.draw(g, boardX - panelWidth - 20);
 
-        // pannel player 2
-        player2Panel.draw(g, boardX + board.getImg().getImg().getWidth() + 20);
-    }
+    //     // pannel player 2
+    //     player2Panel.draw(g, boardX + board.getImg().getImg().getWidth() + 20);
+    // }
 
     private void drawSinglePanel(Graphics2D g, String playerId,
             int x, int y, int width, int height) {

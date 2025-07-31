@@ -98,7 +98,7 @@ public class Board {
         }
         BufferedImage buffer = ((Img) boardImg).getImg();
         Graphics2D g = buffer.createGraphics();
-        Color color = playerId.equals("P1") ? new Color(0, 0, 255, 100) : new Color(0, 255, 0, 100);
+        Color color = playerId.equals("P1") ? new Color(0, 255, 0, 100) : new Color(0, 0, 255, 100);
         int x = cell[1] * getCellWPix();
         int y = cell[0] * getCellHPix();
         g.setColor(color);
@@ -163,13 +163,16 @@ public class Board {
             BufferedImage rendered = gameUI.renderFrame();
             System.out.println("rendered frame: " + rendered.getWidth() + "x" + rendered.getHeight());
 
-            JLabel label = new JLabel(new ImageIcon(rendered));
+            this.label = new JLabel(new ImageIcon(rendered));
             frame.getContentPane().add(label);
 
             frame.setPreferredSize(new Dimension(rendered.getWidth() + 40, rendered.getHeight() + 40));
             frame.pack();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+            //
+            frame.requestFocus();
+            frame.requestFocusInWindow();
 
             frame.addKeyListener(new KeyAdapter() {
                 @Override

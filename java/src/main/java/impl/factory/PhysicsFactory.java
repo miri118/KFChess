@@ -11,6 +11,8 @@ import impl.model.board.Board;
 
     public Physics load(int[] startCell, PhysicsDto dto) {
         double speed =dto != null ? dto.speed_m_per_sec : 0.0;
-        return new Physics(startCell, board, speed);
+        String nextState = (dto != null && dto.next_state_when_finished != null)
+                                ? dto.next_state_when_finished : "idle";
+        return new Physics(startCell, board, speed, nextState);
     }
 }

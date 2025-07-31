@@ -11,8 +11,11 @@ public class CursorPositionManager {
     public CursorPositionManager(int maxRow, int maxCol) {
         this.maxRow = maxRow;
         this.maxCol = maxCol;
-        cursors.put("P1", new int[] { 0, 0 });
-        cursors.put("P2", new int[] { 7, 7 });
+        cursors.put("P1", new int[] { 6, 0 }); // במקום 0,0 – שורה 6 = שורת הלבנים
+        cursors.put("P2", new int[] { 1, 7 }); // במקום 7,7 – שורה 1 = שורת השחורים
+
+        // cursors.put("P1", new int[] { 0, 0 });
+        // cursors.put("P2", new int[] { 7, 7 });
     }
 
     public int[] getCursor(String playerId) {

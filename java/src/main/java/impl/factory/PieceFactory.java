@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class PieceFactory {
     private final Board board;
@@ -27,14 +28,24 @@ public class PieceFactory {
         Path movesPath = pieceFolder.resolve("moves.txt");
         Map<String, State> states = loadAllStates(pieceFolder.resolve("states"), startCell, movesPath);
 
-        //const idle state to first state
+        // const idle state to first state
         State initial = states.get("idle");
         if (initial == null) {
             throw new IllegalStateException("Missing idle state for piece: " + pieceId);
         }
 
-        //by transitions.csv create transitions
-        Path transitionsCsv = pieceFolder.resolve("transitions.csv");
+        // by transitions.csv create transitions
+        Path transitionsCsv;
+        try {
+            URL resourceUrl = getClass().getClassLoader().getResource("pieces/transitions.csv");
+            if (resourceUrl == null) {
+                throw new IllegalStateException("Global transitions.csv not found in resources");
+            }
+            transitionsCsv = Paths.get(resourceUrl.toURI());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load global transitions.csv", e);
+        }
+        
         if (transitionsCsv.toFile().exists()) {
             List<String> lines = readLines(transitionsCsv);
             for (String line : lines) {
@@ -42,7 +53,8 @@ public class PieceFactory {
                 if (l.isEmpty() || l.startsWith("#") || l.toLowerCase().startsWith("from_state"))
                     continue;
                 String[] parts = l.split(",");
-                if (parts.length < 3) continue;
+                if (parts.length < 3)
+                    continue;
 
                 String from = parts[0].trim();
                 String event = parts[1].trim().toUpperCase();
@@ -51,7 +63,7 @@ public class PieceFactory {
                 State fromState = states.get(from);
                 State toState = states.get(to);
                 if (fromState != null && toState != null) {
-                    fromState.setTransition(event, toState);
+                    fromState.setTransition(event.toLowerCase(), () -> toState);
                 }
             }
         }
@@ -60,17 +72,60 @@ public class PieceFactory {
     }
 
     private Map<String, State> loadAllStates(Path statesFolder, int[] startCell, Path moves) {
-        Map<String, State> map = new HashMap<>();
-        File[] dirs = statesFolder.toFile().listFiles(File::isDirectory);
-        if (dirs == null) return map;
+        Map<String, Supplier<State>> stateSuppliers = new HashMap<>();
 
+        File[] dirs = statesFolder.toFile().listFiles(File::isDirectory);
+        if (dirs == null)
+            return new HashMap<>();
+
+        // step 1: create suppliers for each state
         for (File dir : dirs) {
             String stateName = dir.getName();
             Path statePath = dir.toPath();
-            State state = stateFactory.load(statePath, moves, startCell);
-            map.put(stateName, state);
+            stateSuppliers.put(stateName, () -> stateFactory.load(statePath, moves,
+                    startCell, stateName, () -> stateSuppliers.get(stateName).get()));
         }
-        return map;
+
+        // שלב 2: טעינה ממשית של כל המצבים מתוך הספקים
+        Map<String, State> states = new HashMap<>();
+        for (Map.Entry<String, Supplier<State>> entry : stateSuppliers.entrySet()) {
+            states.put(entry.getKey(), entry.getValue().get());
+        }
+
+        // שלב 3: יצירת מעבר אוטומטי לפי next_state_when_finished
+        for (Map.Entry<String, State> entry : states.entrySet()) {
+            State state = entry.getValue();
+            String nextName = state.getPhysics().getNextStateName();
+            if (nextName != null && stateSuppliers.containsKey(nextName)) {
+                state.setTransition(nextName, stateSuppliers.get(nextName));
+            }
+        }
+
+        // שלב 4: טעינת transitions.csv אם קיים
+        Path transitionsCsv = statesFolder.getParent().resolve("transitions.csv");
+        if (transitionsCsv.toFile().exists()) {
+            List<String> lines = readLines(transitionsCsv);
+            for (String line : lines) {
+                String l = line.strip();
+                if (l.isEmpty() || l.startsWith("#") || l.toLowerCase().startsWith("from_state"))
+                    continue;
+                String[] parts = l.split(",");
+                if (parts.length < 3)
+                    continue;
+
+                String from = parts[0].trim();
+                String event = parts[1].trim().toLowerCase(); // lowercase כמו ב־setTransition
+                String to = parts[2].trim();
+
+                State fromState = states.get(from);
+                Supplier<State> toSupplier = stateSuppliers.get(to);
+
+                if (fromState != null && toSupplier != null) {
+                    fromState.setTransition(event, toSupplier);
+                }
+            }
+        }
+        return states;
     }
 
     private static List<String> readLines(Path file) {

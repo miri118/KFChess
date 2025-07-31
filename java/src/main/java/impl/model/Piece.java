@@ -22,6 +22,7 @@ public class Piece {
      * Handle a command for this piece.
      */
     public void onCommand(Command cmd, int nowMs, Map<String, Piece> allPieces) {
+        if (cmd == null) return;
         if (cmd.getType() == CommandType.MOVE || cmd.getType() == CommandType.JUMP) {
             if (cmd.getParams().size() != 2)
                 return;
@@ -36,13 +37,20 @@ public class Piece {
             if (!isMoveAllowed(from, to, allPieces))
                 return;
 
-            this.visualState = this.visualState.processCommand(cmd, nowMs);
-            this.visualState.update(nowMs);
+            State next = this.visualState.processCommand(cmd);
+            if (next != null) {
+                System.out.println("[DEBUG] before: " + this.visualState.getCommand().getType());
+                this.visualState = next;
+                System.out.println("[DEBUG] after: " + this.visualState.getCommand().getType());
+                this.visualState.update(nowMs);
+            } else {
+                System.out.println("[WARNING] No transition for command: " + cmd.getType());
+            }
+
             System.out.printf("[OK] %s moves from %s to %s%n", pieceId, formatCell(from), formatCell(to));
         }
     }
 
-    
     private boolean isAtExpectedSource(int[] from) {
         int[] actual = getPosition();
         if (from[0] != actual[0] || from[1] != actual[1]) {
@@ -114,6 +122,9 @@ public class Piece {
      * Update the piece state based on current time.
      */
     public void update(int nowMs) {
+        int[] pos = getPosition();
+        System.out.printf("[UPDATE] %s is at %s%n", pieceId, (char) ('A' + pos[1]) + "" + (pos[0] + 1));
+
         this.visualState = this.visualState.update(nowMs);
     }
 
@@ -122,6 +133,11 @@ public class Piece {
      */
 
     public void drawOnBoard(Img frameImg, Board board, int nowMs) {
+        if (visualState == null) {
+            System.out.println("[DRAW] Skipping draw, visualState is null for " + pieceId);
+            return;
+        }
+
         // 1. get the cell position from the physics state
         int[] cell = visualState.getPhysics().getEndCell(); // [row, col]
 
@@ -131,14 +147,14 @@ public class Piece {
 
         // 3. get the current sprite image from the visual state
         Img sprite = this.visualState.getCurrentSprite(nowMs); // מימוש נדרש ב-State שלך
-        System.out.println("cell = " + cell[0] + ", " + cell[1]);
+        // System.out.println("cell = " + cell[0] + ", " + cell[1]);
 
         if (sprite == null) {
             System.out.println("sprite is null for pieceId: " + pieceId);
             return;
         }
-        System.out.printf("Drawing piece %s at [%d,%d] -> pixels (%d,%d)%n",
-                pieceId, cell[0], cell[1], cell[1] * wPix, cell[0] * hPix);
+        // System.out.printf("Drawing piece %s at [%d,%d] -> pixels (%d,%d)%n",
+        // pieceId, cell[0], cell[1], cell[1] * wPix, cell[0] * hPix);
 
         sprite.drawOn(frameImg, cell[0], cell[1], wPix, hPix);
     }
