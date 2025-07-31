@@ -1,4 +1,5 @@
 package impl.model;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ public class State {
     private Physics physics;
     private Map<String, State> transitions;
     private Moves moves;
+
     /**
      * Initialize state with moves, graphics, and physics components.
      */
@@ -31,7 +33,7 @@ public class State {
      */
     public void reset(Command cmd) {
         if (cmd == null) {
-        return;
+            return;
         }
         cmd.setTimestamp((int) System.currentTimeMillis());
         graphics.reset(cmd);
@@ -54,12 +56,13 @@ public class State {
      * Get the next state after processing a command.
      */
     public State processCommand(Command cmd, int nowMs) {
-        State res = transitions.get(cmd.getType());
-        if (res == null) {
+        State next = transitions.get(cmd.getType().toString());
+        if (next == null) {
+            System.out.println("[STATE] No transition for command " + cmd.getType());
             return null;
         }
-        res.reset(cmd);
-        return res;
+        next.reset(cmd);
+        return next;
     }
 
     /**
@@ -79,7 +82,7 @@ public class State {
         return null;
     }
 
-    public Img getCurrentSprite(int nowMs) { 
+    public Img getCurrentSprite(int nowMs) {
         return graphics.getImg(); // Placeholder, replace with actual implementation
     }
 
@@ -106,5 +109,9 @@ public class State {
 
     public void setTransitions(Map<String, State> transitions) {
         this.transitions = transitions;
+    }
+
+    public Moves getMoves() {
+        return moves;
     }
 }

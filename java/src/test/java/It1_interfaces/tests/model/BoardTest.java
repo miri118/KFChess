@@ -1,10 +1,11 @@
 package It1_interfaces.tests.model;
 
+import impl.model.Img;
+import impl.model.board.Board;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import impl.model.Img;
-import impl.model.board.Board;
+import java.awt.image.BufferedImage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,8 +16,10 @@ class BoardTest {
 
     @BeforeEach
     void setUp() {
-        mockImg = new Img();
-        board = new Board(10, 20, 1, 1, 8, 8, mockImg);
+        // Create dummy 160x160 image for 8x8 board with 20x20 cells
+        BufferedImage dummyImage = new BufferedImage(160, 160, BufferedImage.TYPE_INT_ARGB);
+        mockImg = new Img(dummyImage);
+        board = new Board(20, 20, 1, 1, 8, 8, mockImg);
     }
 
     @Test
@@ -39,7 +42,8 @@ class BoardTest {
         board.setHCells(12);
         assertEquals(12, board.getHCells());
 
-        Img newImg = new Img();
+        BufferedImage anotherDummy = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        Img newImg = new Img(anotherDummy);
         board.setImg(newImg);
         assertEquals(newImg, board.getImg());
     }
@@ -61,10 +65,10 @@ class BoardTest {
     @Test
     void testCellStringToCoords_Valid() {
         int[] coords = board.cellStringToCoords("A1");
-        assertArrayEquals(new int[] { 0, 0 }, coords);
+        assertArrayEquals(new int[]{0, 0}, coords);
 
         coords = board.cellStringToCoords("H8");
-        assertArrayEquals(new int[] { 7, 7 }, coords);
+        assertArrayEquals(new int[]{7, 7}, coords);
     }
 
     @Test
@@ -76,8 +80,7 @@ class BoardTest {
 
     @Test
     void testCellStringToCoords_OutOfBounds() {
-        assertThrows(IllegalArgumentException.class, () -> board.cellStringToCoords("I1")); // col > 7
-        assertThrows(IllegalArgumentException.class, () -> board.cellStringToCoords("A9")); // row > 7
+        assertThrows(IllegalArgumentException.class, () -> board.cellStringToCoords("I1"));
+        assertThrows(IllegalArgumentException.class, () -> board.cellStringToCoords("A9"));
     }
-
 }

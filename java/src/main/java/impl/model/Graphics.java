@@ -32,8 +32,8 @@ public class Graphics {
     }
 
     public void reset(Command cmd) {
-        CommandType type = cmd.getType();
-        this.spritesFolder = spritesFolder.resolve(type.toString().toLowerCase());
+        // CommandType type = cmd.getType();
+        // this.spritesFolder = spritesFolder.resolve(type.toString().toLowerCase());
         this.startMs = System.currentTimeMillis();
         loadFrames();
     }

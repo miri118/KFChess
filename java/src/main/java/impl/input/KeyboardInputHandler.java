@@ -19,7 +19,7 @@ public class KeyboardInputHandler {
     private final CursorPositionManager cursorManager;
     private final Board board;
     private final Map<String, Piece> pieces;
-    private final Map<String, String> selectedPieceIds = new HashMap<>();
+    private final Map<String, String> selectedPieceByPlayer = new HashMap<>();
 
     public KeyboardInputHandler(
             CommandProducer commandProducer,
@@ -44,14 +44,20 @@ public class KeyboardInputHandler {
 
     public void onKeyPressed(String key, int timestamp) {
         System.out.println("[KEYBOARD] Key pressed: " + key + " at " + timestamp);
+
+        String upperKey = key.toUpperCase();
+
         // Player 1
-        handlePlayerInput("P1", key.toUpperCase(), timestamp, "ENTER", "BACK_SPACE",
-                Map.of("UP", new int[] { -1, 0 }, "DOWN", new int[] { 1, 0 }, "LEFT", new int[] { 0, -1 }, "RIGHT",
-                        new int[] { 0, 1 }));
+        handlePlayerInput("P1", upperKey, timestamp, "ENTER", "BACK_SPACE",
+                Map.of("UP", new int[] { -1, 0 }, "DOWN", new int[] { 1, 0 },
+                        "LEFT", new int[] { 0, -1 }, "RIGHT", new int[] { 0, 1 }));
+
         // Player 2
-        handlePlayerInput("P2", key.toUpperCase(), timestamp, "SPACE", "SHIFT",
-                Map.of("W", new int[] { -1, 0 }, "S", new int[] { 1, 0 }, "A", new int[] { 0, -1 }, "D",
-                        new int[] { 0, 1 }));
+        handlePlayerInput("P2", upperKey, timestamp, "SPACE", "SHIFT",
+                Map.of("W", new int[] { -1, 0 }, "S", new int[] { 1, 0 },
+                        "A", new int[] { 0, -1 }, "D", new int[] { 0, 1 },
+                        "UP", new int[] { -1, 0 }, "DOWN", new int[] { 1, 0 },
+                        "LEFT", new int[] { 0, -1 }, "RIGHT", new int[] { 0, 1 }));
     }
 
     private String findPieceAt(int[] pos, String playerId) {
@@ -68,7 +74,7 @@ public class KeyboardInputHandler {
 
     private void handlePlayerInput(String playerId, String key, int timestamp, String confirmKey, String jumpKey,
             Map<String, int[]> movementKeys) {
-        
+
         if (movementKeys.containsKey(key)) {
             int[] delta = movementKeys.get(key);
             cursorManager.move(playerId, delta[0], delta[1]);
@@ -82,7 +88,7 @@ public class KeyboardInputHandler {
             Graphics2D g2d = updated.createGraphics();
             g2d.drawImage(base, 0, 0, null);
             g2d.dispose();
-            boardImg.setImg(updated);
+            // boardImg.setImg(updated);
             g2d.dispose();
         } else if (key.equals(confirmKey)) {
             System.out.println("[COMMAND] " + playerId + " pressed confirm (" + key + ")");
@@ -95,13 +101,34 @@ public class KeyboardInputHandler {
         }
     }
 
-    private void sendMoveCommand(String pieceId, int timestamp) {
-        int[] fromPos = pieces.get(pieceId).getPosition();
-        String from = String.format("%c%d", 'A' + fromPos[1], fromPos[0] + 1);
-        int[] dest = cursorManager.getCursor(pieceId);
+    private void sendMoveCommand(String playerId, int timestamp) {
+        int[] dest = cursorManager.getCursor(playerId);
         String to = String.format("%c%d", 'A' + dest[1], dest[0] + 1);
-        Command cmd = commandProducer.createMoveCommand(pieceId, from, to, timestamp);
-        commandQueue.add(cmd);
+
+        if (!selectedPieceByPlayer.containsKey(playerId)) {
+            // try to select a piece at the destination
+            String pieceId = findPieceAt(dest, playerId);
+            if (pieceId != null) {
+                selectedPieceByPlayer.put(playerId, pieceId);
+                String from = String.format("%c%d", 'A' + dest[1], dest[0] + 1);
+                Command cmd = commandProducer.createSelectCommand(pieceId, from, timestamp);
+                commandQueue.add(cmd);
+                System.out.printf("[COMMAND] %s selected %s at %s%n", playerId, pieceId, from);
+            } else {
+                System.out.printf("[COMMAND] %s tried to select but no piece at %s%n", playerId, to);
+            }
+        } else {
+            // כבר בחר כלי – עכשיו זה מהלך MOVE
+            String pieceId = selectedPieceByPlayer.get(playerId);
+            int[] fromPos = pieces.get(pieceId).getPosition();
+            String from = String.format("%c%d", 'A' + fromPos[1], fromPos[0] + 1);
+
+            Command cmd = commandProducer.createMoveCommand(pieceId, from, to, timestamp);
+            commandQueue.add(cmd);
+            System.out.printf("[COMMAND] %s issued MOVE %s: %s -> %s%n", playerId, pieceId, from, to);
+
+            selectedPieceByPlayer.remove(playerId); // נקה בחירה
+        }
     }
 
     private void sendJumpCommand(String pieceId, int timestamp) {

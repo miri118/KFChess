@@ -7,7 +7,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-
 public class Img {
 
     private BufferedImage img;
@@ -64,14 +63,17 @@ public class Img {
         return read(path, null, false, null);
     }
 
-    
     public void drawOn(Img board, int cellRow, int cellCol, int cellW, int cellH) {
         if (img == null || board.img == null)
             throw new IllegalStateException("Both images must be loaded.");
 
         // position in pixels
-        int xPix = cellCol * cellW; // שים לב: column קובע את X
-        int yPix = cellRow * cellH; // שים לב: row קובע את Y
+        int xPix = cellCol * cellW;
+        int yPix = cellRow * cellH;
+
+        if (xPix + cellW > board.img.getWidth() || yPix + cellH > board.img.getHeight()) {
+            throw new IllegalArgumentException("Drawing out of bounds: (" + xPix + "," + yPix + ")");
+        }
 
         // צייר ישירות על תמונת הלוח
         Graphics2D g = board.img.createGraphics();
@@ -150,6 +152,7 @@ public class Img {
     public int getWidth() {
         return img != null ? img.getWidth() : 0;
     }
+
     public int getHeight() {
         return img != null ? img.getHeight() : 0;
     }

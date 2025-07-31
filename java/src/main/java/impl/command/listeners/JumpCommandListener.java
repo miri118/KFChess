@@ -29,7 +29,7 @@ public class JumpCommandListener{
         Piece piece = pieces.get(cmd.getPieceId());
         if (piece != null) {
             long now = System.currentTimeMillis();
-            piece.onCommand(cmd, (int) now);
+            piece.onCommand(cmd, (int) now, pieces);
             // piece.drawOnBoard( board, (int) now);
             int[] cursorPos = cursorManager.getCursor(cmd.getPieceId());
            board.drawCursorOverlay(cmd.getPieceId(), cursorPos, board.getImg());

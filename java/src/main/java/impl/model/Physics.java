@@ -20,7 +20,9 @@ public class Physics {
     }
 
     public void reset(Command command, int[] newTarget) {
-        this.startCell = this.endCell;
+        //maybe to delete
+        this.startCell = newTarget;
+        // this.startCell = this.endCell;
         this.endCell = newTarget;
         this.startMs = System.currentTimeMillis();
         this.durationMs = computeDuration(startCell, endCell, speedMS);

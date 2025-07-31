@@ -1,13 +1,14 @@
 package impl.command;
+
 import java.util.List;
 
 import impl.enums.CommandType;
+
 /**
  * Produces Command instances from game input or events.
  */
-public class CommandProducer{
+public class CommandProducer {
 
-    
     public Command createMoveCommand(String pieceId, String from, String to, int timestamp) {
         return new Command(timestamp, pieceId, CommandType.MOVE, List.of(from, to));
     }
@@ -26,6 +27,10 @@ public class CommandProducer{
 
     public Command createShortRestCommand(String pieceId, int timestamp) {
         return new Command(timestamp, pieceId, CommandType.SHORT_REST);
+    }
+
+    public Command createSelectCommand(String pieceId, String from, int timestamp) {
+        return new Command(timestamp, pieceId, CommandType.SELECT, List.of(from));
     }
 
     public Command createGenericCommand(String pieceId, String type, List<String> params, int timestamp) {

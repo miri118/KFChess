@@ -45,7 +45,7 @@ public class PieceFactory {
                 if (parts.length < 3) continue;
 
                 String from = parts[0].trim();
-                String event = parts[1].trim().toLowerCase();
+                String event = parts[1].trim().toUpperCase();
                 String to = parts[2].trim();
 
                 State fromState = states.get(from);

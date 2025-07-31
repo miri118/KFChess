@@ -86,6 +86,12 @@ public class Board {
         }
     }
 
+    public void updateImageOnUI(BufferedImage newImage) {
+        if (label != null) {
+            label.setIcon(new ImageIcon(newImage));
+        }
+    }
+
     public void drawCursorOverlay(String playerId, int[] cell, Img boardImg) {
         if (!(boardImg instanceof Img)) {
             throw new IllegalArgumentException("boardImg must be instance of Img");
@@ -150,46 +156,45 @@ public class Board {
     }
 
     public void showWithGameUI(GameUI gameUI, KeyboardInputHandler inputHandler) {
-    SwingUtilities.invokeLater(() -> {
-        frame = new JFrame("KONG FU CHESS");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        SwingUtilities.invokeLater(() -> {
+            frame = new JFrame("KONG FU CHESS");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        BufferedImage rendered = gameUI.renderFrame();
-        System.out.println("rendered frame: " + rendered.getWidth() + "x" + rendered.getHeight());
+            BufferedImage rendered = gameUI.renderFrame();
+            System.out.println("rendered frame: " + rendered.getWidth() + "x" + rendered.getHeight());
 
-        JLabel label = new JLabel(new ImageIcon(rendered));
-        frame.getContentPane().add(label);
-        
-        frame.setPreferredSize(new Dimension(rendered.getWidth() + 40, rendered.getHeight() + 40));
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+            JLabel label = new JLabel(new ImageIcon(rendered));
+            frame.getContentPane().add(label);
 
-        frame.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                String key = switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP -> "UP";
-                    case KeyEvent.VK_DOWN -> "DOWN";
-                    case KeyEvent.VK_LEFT -> "LEFT";
-                    case KeyEvent.VK_RIGHT -> "RIGHT";
-                    case KeyEvent.VK_ENTER -> "ENTER";
-                    case KeyEvent.VK_SPACE -> "SPACE";
-                    case KeyEvent.VK_W -> "W";
-                    case KeyEvent.VK_A -> "A";
-                    case KeyEvent.VK_S -> "S";
-                    case KeyEvent.VK_D -> "D";
-                    default -> null;
-                };
-                if (key != null) {
-                    inputHandler.onKeyPressed(key, (int) System.currentTimeMillis());
-                    label.setIcon(new ImageIcon(gameUI.renderFrame()));
+            frame.setPreferredSize(new Dimension(rendered.getWidth() + 40, rendered.getHeight() + 40));
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+
+            frame.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    String key = switch (e.getKeyCode()) {
+                        case KeyEvent.VK_UP -> "UP";
+                        case KeyEvent.VK_DOWN -> "DOWN";
+                        case KeyEvent.VK_LEFT -> "LEFT";
+                        case KeyEvent.VK_RIGHT -> "RIGHT";
+                        case KeyEvent.VK_ENTER -> "ENTER";
+                        case KeyEvent.VK_SPACE -> "SPACE";
+                        case KeyEvent.VK_W -> "W";
+                        case KeyEvent.VK_A -> "A";
+                        case KeyEvent.VK_S -> "S";
+                        case KeyEvent.VK_D -> "D";
+                        default -> null;
+                    };
+                    if (key != null) {
+                        inputHandler.onKeyPressed(key, (int) System.currentTimeMillis());
+                        label.setIcon(new ImageIcon(gameUI.renderFrame()));
+                    }
                 }
-            }
+            });
         });
-    });
-}
-
+    }
 
     // Clone the board with a copy of the image.
     public Board clone() {

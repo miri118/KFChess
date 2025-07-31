@@ -4,5 +4,6 @@ public enum CommandType {
     JUMP,
     IDLE,
     LONG_REST,
-    SHORT_REST
+    SHORT_REST,
+    SELECT
 }

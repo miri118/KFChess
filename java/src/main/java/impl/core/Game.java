@@ -1,169 +1,152 @@
 package impl.core;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Scanner;
 
+import java.util.Map;
+import java.awt.image.BufferedImage;
 import impl.command.Command;
+import impl.command.CommandQueue;
 import impl.model.Piece;
 import impl.model.board.Board;
+import impl.ui.GameUI;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class Game {
     private Map<String, Piece> pieces;
     private Board board;
-    private Queue<Command> userInputQueue;
-    private final Scanner scanner = new Scanner(System.in);
+    private CommandQueue commandQueue;
+    // private final Scanner scanner = new Scanner(System.in);
+    private GameUI gameUI;
+    private final long startNs;
 
     /**
      * Initialize the game with pieces, board, and optional event bus.
      */
-    public Game(List<Piece> piecesList, Board board) {
+    public Game(List<Piece> piecesList, Board board, GameUI gameUI, CommandQueue queue) {
         this.pieces = new HashMap<>();
         for (Piece p : piecesList) {
             this.pieces.put(p.getPieceId(), p);
         }
         this.board = board;
+        this.gameUI = gameUI;
+        this.commandQueue = queue;
+        this.startNs = System.nanoTime();
     }
 
     // helpers
-    /**
-     * Return the current game time in milliseconds.
-     */
+
     public int gameTimeMs() {
-        return (int)(System.nanoTime() / 1_000_000); 
+        return (int) ((System.nanoTime() - startNs) / 1_000_000);
     }
 
-    /**
-     * Return a brand-new Board wrapping a copy of the background pixels
-     * so we can paint sprites without touching the pristine board.
-     */
-    public Board cloneBoard() {
-        return board.clone(); // Assuming Board has a clone method
-    }
-
-    /**
-     * Start the user input thread for mouse handling.
-     */
-    public void startUserInputThread() {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Command cmd = getUserInput();
-                    if (cmd != null) {
-                        userInputQueue.offer(cmd);
-                    }
-                    Thread.sleep(100); // adjust as needed
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break; // exit on interrupt
-                }
-            }
-        }).start();
-    }
-
-    private Command getUserInput() {
-        // try {
-        //     if (scanner.hasNextLine()) {
-        //         String line = scanner.nextLine().trim();
-        //         // דוגמה: פקודה בצורה של "move piece1 right"
-        //         String[] parts = line.split("\\s+");
-        //         if (parts.length >= 3 && parts[0].equalsIgnoreCase("move")) {
-        //             String pieceId = parts[1];
-        //             String direction = parts[2];
-        //             return new Command(timestamp, pieceId, CommandType.MOVE, params);
-        //         }
-        //     }
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        // }
-        return null;
-}
-
-    // ─── main public entrypoint ──────────────────────────────────────────────
-    /**
-     * Main game loop.
-     */
-    public void run() {
-        startUserInputThread();
-
-        int startMs = gameTimeMs();
+    private void resetAllPieces(int startMs) {
         for (Piece p : pieces.values()) {
             p.reset(startMs);
         }
+    }
 
-        // ─────── main loop ──────────────────────────────────────────────────
+    public void run() {
+        int startMs = gameTimeMs();
+        resetAllPieces(startMs);
+        // ----------------------------------------
+        for (Piece p : pieces.values()) {
+            if (p.getPieceId().endsWith("B")) {
+                int[] pos = p.getPosition();
+                System.out.printf("Black Piece %s at %s%n", p.getPieceId(),
+                        (char) ('A' + pos[1]) + "" + (pos[0] + 1));
+            }
+        }
+        // ----------------------------------------------------------
         while (!isWin()) {
             int now = gameTimeMs();
 
-            // (1) update physics & animations
+            // 1. update all pieces
             for (Piece p : pieces.values()) {
                 p.update(now);
             }
 
-            // (2) handle queued Commands from mouse thread
-            // while (!userInputQueue.isEmpty()) {
-            //     Command cmd = userInputQueue.poll();
-            //     processInput(cmd);
-            // }
-
-            // (3) draw current position
-            draw();
-            if (!show()) {
-                break;
+            // 2. process commands
+            while (!commandQueue.isEmpty()) {
+                Command cmd = commandQueue.poll();
+                processInput(cmd, now);
             }
 
-            // (4) detect captures
+            // 3. draw the game state
+            draw();
+
+            // 4. show the game UI
+            if (!show())
+                break;
+
+            // 5. crashing recognize collisions
             resolveCollisions();
+
+            // 💤 take a breath
+            try {
+                Thread.sleep(16); // -60 FPS
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         announceWin();
-        // cv2.destroyAllWindows(); // Not needed in Java
     }
 
-    // ─── drawing helpers ────────────────────────────────────────────────────
-    public void processInput(Command cmd) {
-        int now = gameTimeMs();
-        pieces.get(cmd.getPieceId()).onCommand(cmd, now);
+    private void processInput(Command cmd, int now) {
+        Piece p = pieces.get(cmd.getPieceId());
+        if (p != null) {
+            p.onCommand(cmd, now, pieces);
+        }
     }
 
-    /**
-     * Draw the current game state.
-     */
-    public void draw() {
-        // ...existing code...
+    private void draw() {
+        BufferedImage frame = gameUI.renderFrame();
+        board.updateImageOnUI(frame);
     }
 
-    /**
-     * Show the current frame and handle window events.
-     */
-    public boolean show() {
-        // ...existing code...
-        return true;
-    }
-
-    // ─── capture resolution ────────────────────────────────────────────────
-    /**
-     * Resolve piece collisions and captures.
-     */
-    public void resolveCollisions() {
-        // ...existing code...
-    }
-
-    // ─── board validation & win detection ───────────────────────────────────
-    /**
-     * Check if the game has ended.
-     */
-    public boolean isWin() {
-        // ...existing code...
-        return false;
+    private boolean show() {
+        return true; // Assuming the UI is always shown
     }
 
     /**
-     * Announce the winner.
+     * recognize collisions and resolve them
+     * by removing all but the last piece in each cell
      */
-    public void announceWin() {
-        // ...existing code...
+    private void resolveCollisions() {
+        Map<String, List<Piece>> cellToPieces = new HashMap<>();
+        for (Piece p : pieces.values()) {
+            String posKey = Arrays.toString(p.getPosition());
+            cellToPieces.computeIfAbsent(posKey, k -> new ArrayList<>()).add(p);
+        }
+
+        for (List<Piece> group : cellToPieces.values()) {
+            if (group.size() > 1) {
+                // eat all, Keep the last piece in the group
+                for (int i = 0; i < group.size() - 1; i++) {
+                    pieces.remove(group.get(i).getPieceId());
+                }
+            }
+        }
+    }
+
+    // win - if there is only one king left
+    private boolean isWin() {
+        long kings = pieces.values().stream()
+                .filter(p -> p.getPieceId().startsWith("KW") || p.getPieceId().startsWith("KB"))
+                .count();
+        return kings < 2;
+    }
+
+    // announce the winner
+    private void announceWin() {
+        boolean blackWins = pieces.values().stream().anyMatch(p -> p.getPieceId().startsWith("KB"));
+        String winner = blackWins ? "Black wins!" : "White wins!";
+        System.out.println(winner);
+    }
+
+    public Board cloneBoard() {
+        return board.clone(); // Assuming Board has a clone method
     }
 }

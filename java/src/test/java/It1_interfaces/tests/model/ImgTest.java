@@ -6,11 +6,12 @@ import impl.model.Img;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ImgTest {
-    private static final String IMAGE_PATH = "src/test/resources/board.png";
+    private static final String IMAGE_PATH = Objects.requireNonNull(ImgTest.class.getClassLoader().getResource("board.png")).getPath();
 
     @Test
     public void testReadImage() {
@@ -41,8 +42,7 @@ public class ImgTest {
     @Test
     public void testPutText() {
         Img img = new Img().read(IMAGE_PATH);
-        assertDoesNotThrow(() ->
-                img.putText("Hello", 10, 20, 1.0f, Color.RED, 1),
+        assertDoesNotThrow(() -> img.putText("Hello", 10, 20, 1.0f, Color.RED, 1),
                 "putText caused an exception");
     }
 
@@ -52,16 +52,17 @@ public class ImgTest {
         Img cloned = original.clone();
 
         assertNotSame(original.getImg(), cloned.getImg(), "there should be a new image instance - cloned");
-        assertEquals(original.getImg().getWidth(), cloned.getImg().getWidth(), "difference in width between original and cloned");
-        assertEquals(original.getImg().getHeight(), cloned.getImg().getHeight(), "height should match between original and cloned");
+        assertEquals(original.getImg().getWidth(), cloned.getImg().getWidth(),
+                "difference in width between original and cloned");
+        assertEquals(original.getImg().getHeight(), cloned.getImg().getHeight(),
+                "height should match between original and cloned");
     }
 
     @Test
     public void testDrawOutOfBoundsThrows() {
         Img base = new Img().read(IMAGE_PATH);
         Img small = new Img().read(IMAGE_PATH, new Dimension(100, 100), false, null);
-        assertThrows(IllegalArgumentException.class, () ->
-                small.drawOn(base, 5000, 5000, 100, 100),
+        assertThrows(IllegalArgumentException.class, () -> small.drawOn(base, 5000, 5000, 100, 100),
                 "should throw when drawing out of bounds");
     }
 }
